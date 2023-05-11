@@ -5,6 +5,7 @@ import com.auth0.jwt.JWTCreator;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.exceptions.SignatureVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.logging.Logger;
@@ -16,6 +17,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
+import java.security.SignatureException;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
@@ -133,17 +135,7 @@ public class JWTTokenUtil {
      */
     public boolean isTokenValid(String token) {
         try {
-            Algorithm algorithm = Algorithm.RSA256(getPublicKey(), null);
-            JWTVerifier jwtVerifier = JWT.require(algorithm)
-                    .withIssuer(usedIssuer)
-                    .build();
-
-            //
-            // result is unused except for debugging
-            //
-            @SuppressWarnings("unused")
-            DecodedJWT jwt = jwtVerifier.verify(token);
-            // logger.info("jwt issuer is \"" + jwt.getIssuer() + "\"");
+            validateToken(token);
         } catch (JWTVerificationException exception) {
             logger.info("token is not valid - reason: " + exception.getMessage());
             return false;
@@ -152,6 +144,27 @@ public class JWTTokenUtil {
         return true;
     }
 
+    /**
+     * Validates that a given JWT token string is valid.
+     *
+     * @param token the JWT as a String
+     *
+     * @return a DecodedJWT if the token is valid
+     *
+     * @throws JWTVerificationException if there is an error validating the token
+     *
+     */
+    public DecodedJWT validateToken(String token) throws JWTVerificationException {
+        if( token == null )
+            throw new NullPointerException("token cannot be null");
+
+        Algorithm algorithm = Algorithm.RSA256(getPublicKey(), null);
+        JWTVerifier jwtVerifier = JWT.require(algorithm)
+                .withIssuer(usedIssuer)
+                .build();
+
+        return jwtVerifier.verify(token);
+    }
     /**
      * Helper method to read an RSAPublicKey from a .pem file.
      *

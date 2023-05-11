@@ -1,5 +1,21 @@
 # jwt-generator
 
+This code contains an example that generates and validates JWT tokens using the
+[Auth0 Java-JWT](https://github.com/auth0/java-jwt)
+library.  A driver JAX-RS service is included that allows you to generate the tokens with a browser.  However, the
+code for the service should not be considered anything but an example.  The code gets a username and password
+from configuration which is only a small step above being hard-coded.  This is a [Quarkus](https://quarkus.io)
+application and so can be packaged in a variety of ways if you want.  Full unit tests are included.
+
+
+Service Info
+----
+The service is documented by going to the Quarkus OpenAPI URL at `hostname/q/swagger-ui` where hostname is 
+`http://localhost:8080` if running locally.  There are only three services.
+
+
+Quarkus Info
+----
 This project uses Quarkus, the Supersonic Subatomic Java Framework.
 
 If you want to learn more about Quarkus, please visit its website: https://quarkus.io/ .
